@@ -1,0 +1,12 @@
+{
+  "name": "Leaderboard-Server",
+  "description": "Handles registering/deleting users and set/get player scores.",
+  "author": "Jonathan Dunlap <jdunlap@outlook.com>",
+  "dependencies": {
+    "body-parser": "^1.10.1",
+    "connect-timeout": "^1.5.0",
+    "express": "^4.10.7",
+    "redis": "^0.12.1"
+  },
+  "engine": "node 0.10"
+}

@@ -1,7 +1,14 @@
 var express = require('express'),
       bodyParser = require('body-parser'),
       app = express(),
-      router = require('./app-routes.js');
+      timeout = require('connect-timeout'),
+      Router = require('./app-routes.js');
+
+var db;
+db = require('./redisdb.js');
+//db = require('./localdb.js');
+
+var PORT = 3000;
 
 //-----------------------------------------------------------------------------
 // Entry point for the leaderboard server.
@@ -12,9 +19,11 @@ var express = require('express'),
 // Created by: Jonathan Dunlap
 //-----------------------------------------------------------------------------
 
-var PORT = 3000;
+db.connect();
+var router = new Router(db);
 
 app.use(bodyParser.json({ type: 'application/json' }));
+app.use(timeout('5s'));
 
 // Handle event requests
 app.post('/', router.routePostEvent.bind(router) );
@@ -27,6 +36,6 @@ var server = app.listen(PORT, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('Example app listening at http://%s:%s', host, port);
+  console.log('Leaderboard app listening at http://%s:%s', host, port);
 
 });

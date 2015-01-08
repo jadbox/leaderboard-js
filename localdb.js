@@ -65,41 +65,43 @@ SortedList.prototype.getScores = function (start, end) {
 // Wrapper for handling score data inserting and querying
 //-----------------------------------------------------------------------------
 
-var ScoreDB = function() {
+var LocalDB = function() {
   // Game state
   this.players = {};
   this.scores = new SortedList();
-  this.uniqueID = 0;
+  this.uniqueID = 1;
 };
 
-// Wrapper to connect to a DB, if this server needed to connect to one.
-ScoreDB.prototype.connect = function () {
+// Wrapper to connect to a DB, not needed here since it's server-local
+LocalDB.prototype.connect = function () {
   return true;
 };
 
 // Save the user's score
-ScoreDB.prototype.saveScore = function (playerID, score) {
+LocalDB.prototype.saveScore = function (playerID, score) {
   var node = this.players[playerID] ;
   node.score = score;
   this.scores.addOrUpdate(node);
 };
 
-// Get a range of scores
-ScoreDB.prototype.getScores = function (start, end) {
-  return this.scores.getScores(start,end);
+// Get a range of scores.
+// Function is async (by interface) to support DB clients.
+LocalDB.prototype.getScores = function (start, end, onData) {
+  var scores = this.scores.getScores(start,end);
+  onData(scores);
 };
 
 // Register a new player
-ScoreDB.prototype.registerPlayer = function (name) {
+LocalDB.prototype.registerPlayer = function (name, onID) {
   var id = this.uniqueID;
   var player = this.players[id] = makePlayerBlob(id, name);
   this.saveScore(id, 0);
   this.uniqueID++;
-  return player;
+  onID(id);
 };
 
 // Delete a player
-ScoreDB.prototype.deletePlayer = function (playerID) {
+LocalDB.prototype.deletePlayer = function (playerID) {
   if( !this.players[playerID] ) return false;
 
   this.scores.remove( this.players[playerID]  );
@@ -107,15 +109,12 @@ ScoreDB.prototype.deletePlayer = function (playerID) {
   return true;
 };
 
-// Check if the player exists
-ScoreDB.prototype.hasPlayer = function (playerID) {
-  return this.players[playerID]!==undefined;
-};
-
 // Get a score that's specific to a user. Does not need to traverse the linked list.
-ScoreDB.prototype.getScore = function (playerID) {
+// Function is async (by interface) to support DB clients.
+LocalDB.prototype.getScore = function (playerID, onData) {
   // If the user doens't have a saved score yet, return 0
-  return this.players[playerID]===undefined ? 0 : this.players[playerID].score;
+  var score = this.players[playerID]===undefined ? 0 : this.players[playerID].score;
+  onData(score);
 };
 
-module.exports = new ScoreDB();
+module.exports = new LocalDB();

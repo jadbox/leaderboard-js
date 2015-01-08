@@ -4,7 +4,7 @@
 
 function makePlayerBlob(id, name) {
   // Intrinsic list iterator included
-  return {id:id, name:name, score:0, next:null, prev:null};
+  return {id: id, playerName: name, score:0, next:null, prev:null};
 }
 
 // A doubly linked list for storing player scores.
@@ -53,7 +53,7 @@ SortedList.prototype.getScores = function (start, end) {
   while(node.score && i <= end)  {
     if(i >= start) {
       // Format the result for the json response, hides the linked nature of the data
-      list.push({playerID: node.id, names: node.name, score: node.score});
+      list.push({playerID: node.id, playerName: ""+node.playerName, score: node.score});
     }
     i++;
     node = node.next;
@@ -79,9 +79,7 @@ ScoreDB.prototype.connect = function () {
 
 // Save the user's score
 ScoreDB.prototype.saveScore = function (playerID, score) {
-  var node;
-  //if(!this.players[playerID]) node = this.players[playerID] = makePlayerBlob(playerID, score);
-  node = this.players[playerID] ;
+  var node = this.players[playerID] ;
   node.score = score;
   this.scores.addOrUpdate(node);
 };

@@ -11,5 +11,4 @@ npm install --save body-parser
 node server.js
 
 **Test case:**  
-With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test script:  
-./test.sh
+With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test script: ./test.sh

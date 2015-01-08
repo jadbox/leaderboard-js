@@ -21,7 +21,7 @@ SortedList.prototype.remove = function(playerBlob) {
   if(playerBlob.prev && playerBlob.prev.next) {
     playerBlob.prev.next = playerBlob.next;
   }
-  
+
   if(this.head == playerBlob) this.head = playerBlob.next;
 };
 
@@ -52,8 +52,8 @@ SortedList.prototype.getScores = function (start, end) {
   var node = this.head;
   while(node.score && i <= end)  {
     if(i >= start) {
-      // Format the result for the json response
-      list.push({playerID: node.id, name:node.name, score: node.score});
+      // Format the result for the json response, hides the linked nature of the data
+      list.push({playerID: node.id, names: node.name, score: node.score});
     }
     i++;
     node = node.next;
@@ -91,6 +91,7 @@ ScoreDB.prototype.getScores = function (start, end) {
   return this.scores.getScores(start,end);
 };
 
+// Register a new player
 ScoreDB.prototype.registerPlayer = function (name) {
   var id = this.uniqueID;
   var player = this.players[id] = makePlayerBlob(id, name);
@@ -99,12 +100,18 @@ ScoreDB.prototype.registerPlayer = function (name) {
   return player;
 };
 
+// Delete a player
 ScoreDB.prototype.deletePlayer = function (playerID) {
   if( !this.players[playerID] ) return false;
 
   this.scores.remove( this.players[playerID]  );
   delete this.players[playerID];
   return true;
+};
+
+// Check if the player exists
+ScoreDB.prototype.hasPlayer = function (playerID) {
+  return this.players[playerID]!==undefined;
 };
 
 // Get a score that's specific to a user. Does not need to traverse the linked list.

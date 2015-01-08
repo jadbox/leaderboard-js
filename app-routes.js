@@ -8,6 +8,10 @@ var db = require('./scoredb.js');
 var AppRoutes = function() {
 };
 
+AppRoutes.prototype.sendNoUserError = function(id, res) {
+  res.json({status: "Error: user id does not exist", playerID: id});
+}
+
 AppRoutes.prototype.registerPlayer = function(body, res) {
   var name = body.name;
   var player = db.registerPlayer(name);
@@ -16,6 +20,10 @@ AppRoutes.prototype.registerPlayer = function(body, res) {
 
 AppRoutes.prototype.setScore = function(body, res) {
   var id = parseInt(body.playerID);
+  if( !db.hasPlayer(id) ) { // Check if user exists
+    this.sendNoUserError(id, res);
+    return;
+  }
   var score = parseInt(body.score); // parse just in case score wasn't an int
   db.saveScore(id, score);
   res.json({status: "Success: setting score", playerID: id, score: score});
@@ -29,6 +37,10 @@ AppRoutes.prototype.getScoreRange = function (body, res) {
 
 AppRoutes.prototype.getScoreByPlayerID = function (body, res) {
   var id = parseInt(body.playerID);
+  if( !db.hasPlayer(id) ) { // Check if user exists
+    this.sendNoUserError(id, res);
+    return;
+  }
   var score = db.getScore(id);
   res.json({status: "Success: recalled score", playerID: id, score: score});
 };
@@ -58,6 +70,10 @@ AppRoutes.prototype.routePostEvent = function(requst, res) {
 AppRoutes.prototype.routeDeleteEvent = function(requst, res) {
   var body = requst.body;
   var id = parseInt(body.playerID);
+  if( !db.hasPlayer(id) ) { // Check if user exists
+    this.sendNoUserError(id, res);
+    return;
+  }
   db.deletePlayer(id);
   res.json({status: "Success: deleted player", playerID: id});
 };

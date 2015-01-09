@@ -8,7 +8,9 @@ var db;
 db = require('./redisdb.js'); // use Redis
 //db = require('./localdb.js'); // use node server memory
 
-var PORT = 3000;
+var PORT = 3000; // default port
+// If first arg is set, use it as server port
+if (process.argv.length > 2) PORT= parseInt(process.argv[2]);
 
 //-----------------------------------------------------------------------------
 // Entry point for the leaderboard server.

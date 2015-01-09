@@ -4,6 +4,7 @@ var TPLAYERS = "player:",
       UID = "uniqueID";
 //-----------------------------------------------------------------------------
 // Redis module to save/restore player and score state
+// Note: All the callbacks give me a headache... if I had more time, I'd refactor with promises.
 //-----------------------------------------------------------------------------
 
 var RedisDB = function() {
@@ -49,13 +50,14 @@ RedisDB.prototype.getScores = function (start, end, onData) {
 
 // Register a new player name and return a new unique ID
 RedisDB.prototype.registerPlayer = function (name, onID) {
-  //var client = this.client;
-  this.client.incr(UID, function(err, id) {
-    this.client.hmset(TPLAYERS+id, {name:name}, redis.print);
-    this.saveScore(id, 0, function(onComplete) {
-      onID(id);
+  var that = this; // preserve scope
+  this.client.incr(UID, function(err, id) { // Increment ID, inits at 1
+    that.client.hmset(TPLAYERS+id, {name:name}, function(err, status) { // Create the player
+      that.saveScore(id, 0, function(onComplete) { // Save the initial score in the sorted list
+        onID(id); // Callback with generated client ID
+      });
     });
-  }.bind(this));
+  });
 
 };
 

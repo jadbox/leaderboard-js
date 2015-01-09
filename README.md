@@ -27,7 +27,7 @@ With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test scri
     "status": "Success: deleted player"
 }```
 * All event actions, aside from delete player, use the POST HTTP method.
-* Server port can be set in server.js
+* Server port is 3000 by default (test.sh uses this), but can be speficied using the first arg.
+  * Example: node server.js 2000
   
-
 _See project files for documentation._

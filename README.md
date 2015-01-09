@@ -2,7 +2,7 @@
 This is a leaderboard game server in Node.js and uses either Redis or local node memory to store player state.
 
 **Get dependencies and run:**  
-npm install
+npm install  
 node server.js  
   
 **Select DB**  

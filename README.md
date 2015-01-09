@@ -27,6 +27,7 @@ With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test scri
     "status": "Success: deleted player"
 }```
 * All event actions, aside from delete player, use the POST HTTP method.
+* Server port can be set in server.js
   
 
 _See project files for documentation._

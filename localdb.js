@@ -1,6 +1,6 @@
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 // Utilities for handling score collections in server active memory
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 
 function makePlayerBlob(id, name) {
   // Intrinsic list iterator included
@@ -70,6 +70,15 @@ var LocalDB = function() {
   this.players = {};
   this.scores = new SortedList();
   this.uniqueID = 1;
+  this.idFreeList = []; // reuse deleted IDs to condense range
+};
+
+// Get a unqiue ID for player, may reuse from past deleted players
+LocalDB.prototype.getID = function () {
+  if(this.idFreeList.length > 0) return this.idFreeList.shift();
+  var id = this.uniqueID;
+  this.uniqueID++;
+  return id; // post op increment
 };
 
 // Wrapper to connect to a DB, not needed here since it's server-local
@@ -78,10 +87,16 @@ LocalDB.prototype.connect = function () {
 };
 
 // Save the user's score
-LocalDB.prototype.saveScore = function (playerID, score) {
+// onComplete returns true on success, false if the user doesn't exist
+LocalDB.prototype.saveScore = function (playerID, score, onComplete) {
   var node = this.players[playerID] ;
+  if(!node) {
+    onComplete(false);
+    return;
+  }
   node.score = score;
   this.scores.addOrUpdate(node);
+  onComplete(true);
 };
 
 // Get a range of scores.
@@ -93,27 +108,35 @@ LocalDB.prototype.getScores = function (start, end, onData) {
 
 // Register a new player
 LocalDB.prototype.registerPlayer = function (name, onID) {
-  var id = this.uniqueID;
+  var id = this.getID();
   var player = this.players[id] = makePlayerBlob(id, name);
-  this.saveScore(id, 0);
-  this.uniqueID++;
-  onID(id);
+  this.saveScore(id, 0, function(onComplete) {
+    onID(id);
+  });
 };
 
 // Delete a player
-LocalDB.prototype.deletePlayer = function (playerID) {
-  if( !this.players[playerID] ) return false;
+// Callback onComplete returns true if player was found and deleted.
+LocalDB.prototype.deletePlayer = function (playerID, onComplete) {
+  if( !this.players[playerID] ) {
+    onComplete(false);
+    return;
+  }
 
   this.scores.remove( this.players[playerID]  );
-  delete this.players[playerID];
-  return true;
+  if( !this.players[playerID] ) {
+    onComplete(false);
+  } else {
+    delete this.players[playerID];
+    this.idFreeList.push(playerID);
+    onComplete(true);
+  }
 };
 
 // Get a score that's specific to a user. Does not need to traverse the linked list.
 // Function is async (by interface) to support DB clients.
 LocalDB.prototype.getScore = function (playerID, onData) {
-  // If the user doens't have a saved score yet, return 0
-  var score = this.players[playerID]===undefined ? 0 : this.players[playerID].score;
+  var score = this.players[playerID]===undefined ? null : this.players[playerID].score;
   onData(score);
 };
 

@@ -5,8 +5,8 @@ var express = require('express'),
       Router = require('./app-routes.js');
 
 var db;
-db = require('./redisdb.js');
-//db = require('./localdb.js');
+db = require('./redisdb.js'); // use Redis
+//db = require('./localdb.js'); // use node server memory
 
 var PORT = 3000;
 
@@ -31,6 +31,7 @@ app.post('/', router.routePostEvent.bind(router) );
 // Delete the user by a DELETE call
 app.delete('/', router.routeDeleteEvent.bind(router) );
 
+// Start listener
 var server = app.listen(PORT, function () {
 
   var host = server.address().address;

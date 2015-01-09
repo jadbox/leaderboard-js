@@ -16,11 +16,16 @@ RedisDB.prototype.connect = function () {
 };
 
 // Save the user's score
-RedisDB.prototype.saveScore = function (playerID, score) {
+RedisDB.prototype.saveScore = function (playerID, score, onComplete) {
   var client = this.client;
-
-  client.zadd([TSCORES, score, playerID], function(err,msg) {
-
+  client.exists(TPLAYERS+playerID, function(err, existed) {
+    if(!existed) {
+        onComplete(false);
+        return;
+    }
+    client.zadd([TSCORES, score, playerID], function(err,msg) {
+      onComplete(true);
+    });
   });
 };
 
@@ -39,23 +44,29 @@ RedisDB.prototype.getScores = function (start, end, onData) {
   return scores;
 };
 
-// Register a new player
+// Register a new player name and return a new unique ID
 RedisDB.prototype.registerPlayer = function (name, onID) {
-  var client = this.client;
-  client.incr(UID); // Increment beforehand as a simple way to create the field if it doesn't exist
-  this.client.get(UID, function(err, id) {
-    client.hmset(TPLAYERS+id, {name:name}, redis.print);
-    this.saveScore(id, 0);
-    onID(id);
+  //var client = this.client;
+  this.client.incr(UID, function(err, id) {
+    this.client.hmset(TPLAYERS+id, {name:name}, redis.print);
+    this.saveScore(id, 0, function(onComplete) {
+      onID(id);
+    });
   }.bind(this));
 
 };
 
 // Delete a player
-RedisDB.prototype.deletePlayer = function (playerID) {
-  this.client.zrem(TSCORES, playerID); // Remove from the sorted score table
-  this.client.del(TPLAYERS+playerID); // Remove from the player tables
-  return true;
+// Callback returns true if player was found and delete, false if player did not exist
+RedisDB.prototype.deletePlayer = function (playerID, onComplete) {
+  this.client.exists(TPLAYERS+playerID, function(err, exists) {
+    if(!exists) onComplete(false);
+    else {
+      this.client.zrem(TSCORES, playerID); // Remove from the sorted score table
+      this.client.del(TPLAYERS+playerID); // Remove from the player tables
+      onComplete(true);
+    }
+  }.bind(this));
 };
 
 // Get a score that's specific to a user. Does not need to traverse the linked list.

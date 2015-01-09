@@ -1,4 +1,4 @@
-# leaderboard-js
+# Leaderboard.js
 Leaderboard game server in Node.js
 
 **Dependencies:**  

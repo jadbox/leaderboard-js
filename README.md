@@ -12,4 +12,4 @@ See lines 8-9 in server.js
 **Test case:**  
 With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test script: ./test.sh  
   
-See project files for documentation.
+_See project files for documentation._

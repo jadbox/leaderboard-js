@@ -9,3 +9,7 @@ body-parser: https://github.com/expressjs/body-parser
 npm install --save express  
 npm install --save body-parser  
 node server.js
+
+**Test case:**
+With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test script:  
+./test.sh

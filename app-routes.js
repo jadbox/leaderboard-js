@@ -51,9 +51,10 @@ AppRoutes.prototype.getScoreByPlayerID = function (body, res) {
   });
 };
 
-// Enlists handlers for routes. The event ID corrisponds to their index.
+// Enlists handlers for routes.
+// NOTE: The event ID corrisponds to their index.
 AppRoutes.prototype.eventRoutes = function() {
-  // Ensure handlers are bound to this scope
+  // Ensure handlers are bound to this scope by using bind
   return [
       this.registerPlayer.bind(this),
       this.saveScore.bind(this),

@@ -23,7 +23,7 @@ db.connect();
 var router = new Router(db);
 
 app.use(bodyParser.json({ type: 'application/json' }));
-app.use(timeout('5s'));
+app.use(timeout('10s'));
 
 // Handle event requests
 app.post('/', router.routePostEvent.bind(router) );

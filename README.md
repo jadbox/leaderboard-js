@@ -14,14 +14,14 @@ With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test scri
   
 **Notes:**  
 * Registering a new user only requires a name, as a playerID will be generated.
-  * Example: http POST localhost:3000 name=Don event:=1
+  * Example: ```http POST localhost:3000 name=Don event:=1```  
   * Reponse: ```{
     "name": "Don", 
     "playerID": 1, 
     "status": "Success: registered player"
     }```
 * Deleting users require the DELETE HTTP method.
-  * Example: http DELETE localhost:3000 playerID="1" 
+  * Example: ```http DELETE localhost:3000 playerID="1"``` 
   * Reponse: ```{
     "playerID": 1, 
     "status": "Success: deleted player"

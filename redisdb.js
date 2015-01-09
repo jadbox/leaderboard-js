@@ -3,7 +3,7 @@ var TPLAYERS = "player:",
       TSCORES = "scores_list",
       UID = "uniqueID";
 //-----------------------------------------------------------------------------
-// Wrapper for handling score data inserting and querying
+// Redis module to save/restore player and score state
 //-----------------------------------------------------------------------------
 
 var RedisDB = function() {
@@ -30,8 +30,11 @@ RedisDB.prototype.saveScore = function (playerID, score, onComplete) {
 };
 
 // Get a range of scores
+// start begins at the highest score
+// end moves backwards to lower scores
 RedisDB.prototype.getScores = function (start, end, onData) {
   var scores = [];
+  // Get range of scores using the sorted Redis list
   this.client.zrevrange(TSCORES, start, end, 'withscores', function(err, members) { //'withscores',
     while(members.length > 0) {
       var id = members.shift();

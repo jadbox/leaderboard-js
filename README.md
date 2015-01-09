@@ -1,9 +1,12 @@
 # Leaderboard.js
-Leaderboard game server in Node.js
+This is a Leaderboard game server in Node.js and uses either Redis or local node memory to store player state.
 
 **Setup and run:**  
 npm install
-node server.js
-
+node server.js  
+  
+**Select DB**  
+See lines 8-9 in server.js
+  
 **Test case:**  
 With [HTTPie](https://github.com/jakubroztocil/httpie), run the client test script: ./test.sh

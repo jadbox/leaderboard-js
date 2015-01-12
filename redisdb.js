@@ -5,6 +5,7 @@ var TPLAYERS = "player:",
 //-----------------------------------------------------------------------------
 // Redis module to save/restore player and score state
 // Note: All the callbacks give me a headache... if I had more time, I'd refactor with promises.
+// Note 2: Redis error reponses are largely ignored. Ideally these would be each handled back to the routes responses.
 //-----------------------------------------------------------------------------
 
 var RedisDB = function() {

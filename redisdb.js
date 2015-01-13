@@ -68,9 +68,13 @@ RedisDB.prototype.deletePlayer = function (playerID, onComplete) {
   this.client.exists(TPLAYERS+playerID, function(err, exists) {
     if(!exists) onComplete(false);
     else {
-      this.client.zrem(TSCORES, playerID); // Remove from the sorted score table
-      this.client.del(TPLAYERS+playerID); // Remove from the player tables
-      onComplete(true);
+      multi = this.client.multi(); // transaction
+      multi.zrem(TSCORES, playerID); // Remove from the sorted score table
+      multi.del(TPLAYERS+playerID); // Remove from the player tables
+      multi.exec(function(err, m) {
+	  onComplete(true);
+      });
+      
     }
   }.bind(this));
 };
